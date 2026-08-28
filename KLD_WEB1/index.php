@@ -14,11 +14,11 @@
         <img src="logo1.png" alt="Logo" class="nav-logo">
       </div>
       <nav class="nav-links">
-        <a href="#hero" class="nav-item active">Home</a>
+        <a href="#hero" class="nav-item active">Hallelujah</a>
         <a href="#facilities" class="nav-item">Facilities</a>
         <a href="#about" class="nav-item">About</a>
         <a href="#terms" class="nav-item">Terms</a>
-        <a href="#faq" class="nav-item">FAQ</a>
+        <a href="#faq" class="nav-item">Fakyu</a>
       </nav>
       <div class="nav-right">
         <!-- Dropdown Container -->
