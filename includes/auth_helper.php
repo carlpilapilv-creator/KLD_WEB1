@@ -398,6 +398,16 @@ function parseTimeToMinutes(string $timeStr): ?int {
  * Conflict formula: new_start < existing_end + B AND new_end + B > existing_start (B = slot_buffer_hrs * 60).
  */
 function hasReservationConflict(string $facilityId, string $bookingDate, string $timeSlot, int $bufferHrs = 1, ?string $excludeResId = null): bool {
+    $slotParts = explode('-', $timeSlot);
+    if (count($slotParts) !== 2) {
+        return true;
+    }
+    $newStart = parseTimeToMinutes($slotParts[0]);
+    $newEnd   = parseTimeToMinutes($slotParts[1]);
+    if ($newStart === null || $newEnd === null || $newStart >= $newEnd) {
+        return true;
+    }
+
     $sql = "SELECT `id`, `time_slot` FROM `reservations`
             WHERE `facility_id` = ?
               AND `booking_date` = ?
@@ -414,16 +424,6 @@ function hasReservationConflict(string $facilityId, string $bookingDate, string 
 
     $existing = dbFetchAll($sql, $types, $params);
     if (empty($existing)) {
-        return false;
-    }
-
-    $slotParts = explode('-', $timeSlot);
-    if (count($slotParts) !== 2) {
-        return false;
-    }
-    $newStart = parseTimeToMinutes($slotParts[0]);
-    $newEnd   = parseTimeToMinutes($slotParts[1]);
-    if ($newStart === null || $newEnd === null) {
         return false;
     }
 
@@ -603,6 +603,253 @@ function cancelReservation(string $resId, int $userId): bool {
 }
 
 /**
+ * Archive a user's own reservation (Cancelled, Rejected, or Completed).
+ * Returns true only if one row changed.
+ */
+function archiveReservation(string $resId, int $userId): bool {
+    if (!preg_match('/^KLD-RES-\d{4}-\d{3,}$/', $resId)) {
+        return false;
+    }
+
+    try {
+        $affected = dbExecute(
+            "UPDATE `reservations`
+             SET `archived_at` = NOW()
+             WHERE `id` = ?
+               AND `user_id` = ?
+               AND `status` IN ('Cancelled', 'Rejected', 'Completed')
+               AND `archived_at` IS NULL",
+            'si',
+            [$resId, $userId]
+        );
+        return $affected === 1;
+    } catch (Throwable $e) {
+        error_log('archiveReservation error: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Check if a user has administrative privileges.
+ * True when role === 'Admin' OR access_level IN ('admin', 'superadmin').
+ */
+function isPrivilegedUser(array $user): bool {
+    return (($user['role'] ?? '') === 'Admin') || in_array($user['access_level'] ?? '', ['admin', 'superadmin'], true);
+}
+
+/**
+ * Get pending reservations for admin review.
+ * Returns only display fields, ordered by created_at ASC (FIFO).
+ */
+function getPendingReservations(): array {
+    return dbFetchAll(
+        "SELECT r.id, r.user_id, u.fullname AS requester_name, r.facility_name,
+                r.event_name, r.purpose, r.booking_date, r.time_slot,
+                r.attendees, r.created_at
+         FROM `reservations` r
+         JOIN `users` u ON r.user_id = u.id
+         WHERE r.status = 'Pending'
+           AND r.archived_at IS NULL
+         ORDER BY r.created_at ASC"
+    );
+}
+
+/**
+ * Approve a pending reservation.
+ * @return array ['success' => bool, 'message' => string]
+ */
+function approveReservation(string $resId, int $adminId): array {
+    if (!preg_match('/^KLD-RES-\d{4}-\d{3,}$/', $resId)) {
+        return ['success' => false, 'message' => 'Invalid reservation ID format.'];
+    }
+
+    $adminUser = dbFetchOne(
+        "SELECT `id`, `role`, `access_level`, `archived_at` FROM `users` WHERE `id` = ? LIMIT 1",
+        'i',
+        [$adminId]
+    );
+    if (!$adminUser || !empty($adminUser['archived_at']) || !isPrivilegedUser($adminUser)) {
+        error_log('approveReservation refused: admin ' . $adminId . ' failed privilege check');
+        return ['success' => false, 'message' => 'You do not have permission to review reservations.'];
+    }
+
+    $existingRes = dbFetchOne(
+        "SELECT `facility_id`, `user_id`, `status`, `archived_at` FROM `reservations` WHERE `id` = ? LIMIT 1",
+        's',
+        [$resId]
+    );
+    if (!$existingRes) {
+        error_log('approveReservation refused: reservation ' . $resId . ' not found');
+        return ['success' => false, 'message' => 'Reservation not found.'];
+    }
+    if ((int)$existingRes['user_id'] === $adminId) {
+        error_log('approveReservation refused: admin ' . $adminId . ' tried to approve own reservation ' . $resId);
+        return ['success' => false, 'message' => 'You cannot review your own request.'];
+    }
+    if ($existingRes['status'] !== 'Pending' || !empty($existingRes['archived_at'])) {
+        error_log('approveReservation refused: reservation ' . $resId . ' status=' . $existingRes['status'] . ' archived=' . ($existingRes['archived_at'] ?? 'null'));
+        return ['success' => false, 'message' => 'This request was already reviewed.'];
+    }
+
+    dbBegin();
+    try {
+        $fac = dbFetchOne("SELECT `id` FROM `facilities` WHERE `id` = ? FOR UPDATE", 's', [$existingRes['facility_id']]);
+        if (!$fac) {
+            dbRollback();
+            return ['success' => false, 'message' => 'Facility not found.'];
+        }
+
+        $res = dbFetchOne("SELECT * FROM `reservations` WHERE `id` = ?", 's', [$resId]);
+        if (!$res) {
+            dbRollback();
+            return ['success' => false, 'message' => 'Reservation not found.'];
+        }
+
+        if ((int)$res['user_id'] === $adminId) {
+            dbRollback();
+            return ['success' => false, 'message' => 'You cannot review your own request.'];
+        }
+
+        if ($res['status'] !== 'Pending' || !empty($res['archived_at'])) {
+            dbRollback();
+            return ['success' => false, 'message' => 'This request was already reviewed.'];
+        }
+
+        $parts = explode('-', $res['time_slot'] ?? '');
+        $startTimeStr = trim($parts[0] ?? '');
+        $startTs = (!empty($startTimeStr) && !empty($res['booking_date']))
+            ? strtotime($res['booking_date'] . ' ' . $startTimeStr)
+            : false;
+
+        if ($startTs === false || $startTs <= time()) {
+            dbRollback();
+            error_log('approveReservation refused: reservation ' . $resId . ' time already passed (startTs=' . ($startTs ?: 'false') . ' now=' . time() . ')');
+            return ['success' => false, 'message' => 'This request is for a time that has already started.'];
+        }
+
+        $sysConfig = getSystemConfig();
+        $bufferHrs = (int)($sysConfig['slot_buffer_hrs'] ?? 1);
+        if (hasReservationConflict($res['facility_id'], $res['booking_date'], $res['time_slot'], $bufferHrs, $resId)) {
+            dbRollback();
+            error_log('approveReservation refused: reservation ' . $resId . ' conflicts with another booking on ' . $res['booking_date'] . ' ' . $res['time_slot']);
+            return ['success' => false, 'message' => 'This time slot conflicts with another reservation.'];
+        }
+
+        $affected = dbExecute(
+            "UPDATE `reservations`
+             SET `status` = 'Approved',
+                 `reviewed_by` = ?,
+                 `reviewed_at` = NOW(),
+                 `review_note` = NULL
+             WHERE `id` = ?
+               AND `status` = 'Pending'
+               AND `archived_at` IS NULL",
+            'is',
+            [$adminId, $resId]
+        );
+
+        if ($affected === 1) {
+            dbCommit();
+            return ['success' => true, 'message' => 'Reservation approved successfully.'];
+        }
+
+        dbRollback();
+        return ['success' => false, 'message' => 'Failed to approve reservation.'];
+    } catch (Throwable $e) {
+        dbRollback();
+        error_log('approveReservation error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'A system error occurred while approving the reservation.'];
+    }
+}
+
+/**
+ * Reject a pending reservation.
+ * @return array ['success' => bool, 'message' => string]
+ */
+function rejectReservation(string $resId, int $adminId, string $note = ''): array {
+    if (!preg_match('/^KLD-RES-\d{4}-\d{3,}$/', $resId)) {
+        return ['success' => false, 'message' => 'Invalid reservation ID format.'];
+    }
+
+    $adminUser = dbFetchOne(
+        "SELECT `id`, `role`, `access_level`, `archived_at` FROM `users` WHERE `id` = ? LIMIT 1",
+        'i',
+        [$adminId]
+    );
+    if (!$adminUser || !empty($adminUser['archived_at']) || !isPrivilegedUser($adminUser)) {
+        return ['success' => false, 'message' => 'You do not have permission to review reservations.'];
+    }
+
+    $existingRes = dbFetchOne(
+        "SELECT `facility_id`, `user_id`, `status`, `archived_at` FROM `reservations` WHERE `id` = ? LIMIT 1",
+        's',
+        [$resId]
+    );
+    if (!$existingRes) {
+        return ['success' => false, 'message' => 'Reservation not found.'];
+    }
+    if ((int)$existingRes['user_id'] === $adminId) {
+        return ['success' => false, 'message' => 'You cannot review your own request.'];
+    }
+    if ($existingRes['status'] !== 'Pending' || !empty($existingRes['archived_at'])) {
+        return ['success' => false, 'message' => 'This request was already reviewed.'];
+    }
+
+    $trimmedNote = trim($note);
+    $reviewNote  = $trimmedNote !== '' ? mb_substr($trimmedNote, 0, 255) : null;
+
+    dbBegin();
+    try {
+        $fac = dbFetchOne("SELECT `id` FROM `facilities` WHERE `id` = ? FOR UPDATE", 's', [$existingRes['facility_id']]);
+        if (!$fac) {
+            dbRollback();
+            return ['success' => false, 'message' => 'Facility not found.'];
+        }
+
+        $res = dbFetchOne("SELECT * FROM `reservations` WHERE `id` = ?", 's', [$resId]);
+        if (!$res) {
+            dbRollback();
+            return ['success' => false, 'message' => 'Reservation not found.'];
+        }
+
+        if ((int)$res['user_id'] === $adminId) {
+            dbRollback();
+            return ['success' => false, 'message' => 'You cannot review your own request.'];
+        }
+
+        if ($res['status'] !== 'Pending' || !empty($res['archived_at'])) {
+            dbRollback();
+            return ['success' => false, 'message' => 'This request was already reviewed.'];
+        }
+
+        $affected = dbExecute(
+            "UPDATE `reservations`
+             SET `status` = 'Rejected',
+                 `reviewed_by` = ?,
+                 `reviewed_at` = NOW(),
+                 `review_note` = ?
+             WHERE `id` = ?
+               AND `status` = 'Pending'
+               AND `archived_at` IS NULL",
+            'iss',
+            [$adminId, $reviewNote, $resId]
+        );
+
+        if ($affected === 1) {
+            dbCommit();
+            return ['success' => true, 'message' => 'Reservation rejected successfully.'];
+        }
+
+        dbRollback();
+        return ['success' => false, 'message' => 'Failed to reject reservation.'];
+    } catch (Throwable $e) {
+        dbRollback();
+        error_log('rejectReservation error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'A system error occurred while rejecting the reservation.'];
+    }
+}
+
+/**
  * Get user notification preferences from the database.
  */
 function getUserPreferences(int $userId): array {
@@ -659,6 +906,110 @@ function changePassword(int $userId, string $oldPassword, string $newPassword): 
         ? ['success' => true, 'message' => 'Password updated successfully.']
         : ['success' => false, 'message' => 'Failed to update password.'];
 }
+
+/**
+ * Update user profile (fullname, contact, department).
+ * Never touches email, id_number, role, access_level, password_hash, or email_verified.
+ * @return array ['success' => bool, 'message' => string]
+ */
+function updateUserProfile(int $userId, string $fullname, string $contact, string $department): array {
+    $fullname   = trim($fullname);
+    $contact    = trim($contact);
+    $department = trim($department);
+
+    $fnLen = mb_strlen($fullname);
+    if ($fnLen < 2 || $fnLen > 150 || !preg_match('/\p{L}/u', $fullname)) {
+        return ['success' => false, 'message' => 'Full name must be between 2 and 150 characters and contain at least one letter.'];
+    }
+
+    if (!preg_match('/^[0-9+\-\s]{7,20}$/', $contact)) {
+        return ['success' => false, 'message' => 'Contact number must be between 7 and 20 digits, spaces, plus or hyphens.'];
+    }
+
+    if ($department !== '') {
+        $deptLen = mb_strlen($department);
+        if ($deptLen < 2 || $deptLen > 100 || !preg_match("/^[\\p{L}\\p{N} .,&()\\-']+$/u", $department)) {
+            return ['success' => false, 'message' => 'Department must be between 2 and 100 characters and contain only allowed letters, numbers, spaces, and punctuation.'];
+        }
+    }
+
+    try {
+        $ok = dbExecute(
+            "UPDATE `users` SET `fullname` = ?, `contact` = ?, `department` = ? WHERE `id` = ? AND `archived_at` IS NULL",
+            'sssi',
+            [$fullname, $contact, $department, $userId]
+        );
+        if ($ok !== false) {
+            if (isset($_SESSION['user']) && (int)($_SESSION['user']['id'] ?? 0) === $userId) {
+                $_SESSION['user']['fullname']   = $fullname;
+                $_SESSION['user']['contact']    = $contact;
+                $_SESSION['user']['department'] = $department;
+            }
+            return ['success' => true, 'message' => 'Profile updated successfully.'];
+        }
+        return ['success' => false, 'message' => 'Failed to update profile. Please try again.'];
+    } catch (Throwable $e) {
+        error_log('updateUserProfile error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'A system error occurred while updating your profile.'];
+    }
+}
+
+/**
+ * Archive own user account.
+ * Requires correct password, non-privileged status, and no active upcoming reservations.
+ * @return array ['success' => bool, 'reason' => string, 'message' => string]
+ */
+function archiveOwnAccount(int $userId, string $password): array {
+    $user = dbFetchOne(
+        "SELECT `id`, `password_hash`, `role`, `access_level` FROM `users` WHERE `id` = ? AND `archived_at` IS NULL LIMIT 1",
+        'i',
+        [$userId]
+    );
+
+    if (!$user) {
+        return ['success' => false, 'reason' => 'not_found', 'message' => 'User account not found.'];
+    }
+
+    if (!password_verify($password, $user['password_hash'])) {
+        return ['success' => false, 'reason' => 'password', 'message' => 'Current password is incorrect.'];
+    }
+
+    $isPrivileged = ($user['role'] === 'Admin') || in_array($user['access_level'], ['admin', 'superadmin'], true);
+    if ($isPrivileged) {
+        return ['success' => false, 'reason' => 'privileged', 'message' => 'Administrator accounts must be archived by a superadmin.'];
+    }
+
+    $activeRes = dbFetchOne(
+        "SELECT `id` FROM `reservations`
+         WHERE `user_id` = ?
+           AND `status` IN ('Pending', 'Approved')
+           AND `archived_at` IS NULL
+           AND `booking_date` >= CURDATE()
+         LIMIT 1",
+        'i',
+        [$userId]
+    );
+
+    if ($activeRes) {
+        return ['success' => false, 'reason' => 'active_reservations', 'message' => 'Cancel or complete your active reservations first.'];
+    }
+
+    try {
+        $affected = dbExecute(
+            "UPDATE `users` SET `archived_at` = NOW() WHERE `id` = ? AND `archived_at` IS NULL",
+            'i',
+            [$userId]
+        );
+        if ($affected !== false && $affected > 0) {
+            return ['success' => true, 'reason' => '', 'message' => 'Account successfully deactivated.'];
+        }
+        return ['success' => false, 'reason' => 'db_error', 'message' => 'Failed to deactivate account. Please try again.'];
+    } catch (Throwable $e) {
+        error_log('archiveOwnAccount error: ' . $e->getMessage());
+        return ['success' => false, 'reason' => 'db_error', 'message' => 'A system error occurred while processing your request.'];
+    }
+}
+
 
 /**
  * Get system configuration from the database.
@@ -837,4 +1188,51 @@ function getOtpResendWait(int $userId, string $purpose): int {
     return $row ? (int) $row['wait_seconds'] : 0;
 }
 
+/**
+ * Get reservation statistics for the admin dashboard.
+ * Returns: pending (all time), approved_month, rejected_month (current calendar month), facilities.
+ */
+function getReservationStats(): array {
+    $pending = dbFetchOne(
+        "SELECT COUNT(*) AS `cnt` FROM `reservations` WHERE `status` = 'Pending' AND `archived_at` IS NULL"
+    );
+    $approvedMonth = dbFetchOne(
+        "SELECT COUNT(*) AS `cnt` FROM `reservations`
+         WHERE `status` = 'Approved'
+           AND `archived_at` IS NULL
+           AND YEAR(`reviewed_at`) = YEAR(CURDATE())
+           AND MONTH(`reviewed_at`) = MONTH(CURDATE())"
+    );
+    $rejectedMonth = dbFetchOne(
+        "SELECT COUNT(*) AS `cnt` FROM `reservations`
+         WHERE `status` = 'Rejected'
+           AND `archived_at` IS NULL
+           AND YEAR(`reviewed_at`) = YEAR(CURDATE())
+           AND MONTH(`reviewed_at`) = MONTH(CURDATE())"
+    );
+    $facilities = dbFetchOne(
+        "SELECT COUNT(*) AS `cnt` FROM `facilities`"
+    );
+    return [
+        'pending'        => (int)($pending['cnt'] ?? 0),
+        'approved_month' => (int)($approvedMonth['cnt'] ?? 0),
+        'rejected_month' => (int)($rejectedMonth['cnt'] ?? 0),
+        'facilities'     => (int)($facilities['cnt'] ?? 0),
+    ];
+}
 
+/**
+ * Get the last 5 reviewed reservations for the admin dashboard.
+ * Returns display fields only: reservation ID, status, facility, requester, reviewed date.
+ */
+function getRecentlyReviewed(): array {
+    return dbFetchAll(
+        "SELECT r.id, r.status, r.facility_name, r.reviewed_at, u.fullname AS requester_name
+         FROM `reservations` r
+         JOIN `users` u ON r.user_id = u.id
+         WHERE r.status IN ('Approved', 'Rejected')
+           AND r.archived_at IS NULL
+         ORDER BY r.reviewed_at DESC
+         LIMIT 5"
+    );
+}

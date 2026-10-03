@@ -46,6 +46,7 @@ $firstName = htmlspecialchars($nameParts[0]);
 // STEP 4: Handle the "Cancel Reservation" POST action (DATABASE UPDATE)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cancel_reservation') {
     if (!csrf_verify()) {
+        auditLog($userId, 'cancel_reservation:csrf');
         setFlash('error', 'Invalid security token. Please refresh and try again.');
         header('Location: dashboard.php');
         exit;
@@ -58,6 +59,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
         setFlash('warning', "Reservation #{$cancelId} has been successfully cancelled.");
     } else {
         setFlash('error', "Unable to cancel reservation #{$cancelId}. Cancellations are only permitted for Pending or Approved bookings at least 24 hours prior to the scheduled start time.");
+    }
+    header('Location: dashboard.php');
+    exit;
+}
+
+// STEP 4B: Handle the "Archive Reservation" POST action (DATABASE UPDATE)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archive_reservation') {
+    if (!csrf_verify()) {
+        auditLog($userId, 'archive_reservation:csrf');
+        setFlash('error', 'Invalid security token. Please refresh and try again.');
+        header('Location: dashboard.php');
+        exit;
+    }
+
+    $resId = trim((string)($_POST['res_id'] ?? ''));
+    $archived = archiveReservation($resId, $userId);
+    if ($archived) {
+        auditLog($userId, 'reservation_archived');
+        setFlash('success', "Reservation #{$resId} has been archived.");
+    } else {
+        setFlash('error', "Unable to archive reservation #{$resId}. Only cancelled, rejected, or completed bookings can be archived.");
     }
     header('Location: dashboard.php');
     exit;
@@ -467,6 +489,20 @@ $completedCount  = count(array_filter($reservations, fn($r) => $r['status'] === 
                                                             class="btn-cancel-res"
                                                             onclick="return confirm('Cancel reservation <?php echo htmlspecialchars($res['id']); ?>? This cannot be undone.');">
                                                         Cancel
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+
+                                            <?php if (in_array($res['status'] ?? '', ['Cancelled', 'Rejected', 'Completed'], true) && empty($res['archived_at'])): ?>
+                                                <!-- Archive form: POST action sets archived_at timestamp -->
+                                                <form method="POST" action="dashboard.php" class="inline-form">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
+                                                    <input type="hidden" name="action" value="archive_reservation">
+                                                    <input type="hidden"
+                                                           name="res_id"
+                                                           value="<?php echo htmlspecialchars($res['id']); ?>">
+                                                    <button type="submit" class="btn-cancel-res">
+                                                        Archive
                                                     </button>
                                                 </form>
                                             <?php endif; ?>

@@ -834,6 +834,30 @@ function initSettingsModals() {
             }
         });
     });
+
+    // Auto-open modal and select tab if specified in URL (?settings=account&tab=profile)
+    const urlParams = new URLSearchParams(window.location.search);
+    const settingsParam = urlParams.get('settings');
+    const tabParam = urlParams.get('tab');
+
+    if (settingsParam === 'account' || settingsParam === 'system') {
+        const modalId = settingsParam === 'account' ? 'accountSettingsModal' : 'systemSettingsModal';
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+            modal.removeAttribute('aria-hidden');
+            document.body.style.overflow = 'hidden';
+
+            if (tabParam) {
+                setTimeout(() => {
+                    const targetTabBtn = modal.querySelector(`.settings-tab-btn[data-settings-tab="${tabParam}"]`);
+                    if (targetTabBtn) {
+                        targetTabBtn.click();
+                    }
+                }, 50);
+            }
+        }
+    }
 }
 
 /* ==========================================================================

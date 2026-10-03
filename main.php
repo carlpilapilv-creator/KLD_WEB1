@@ -259,10 +259,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 }
 
 // -----------------------------------------------------------------------
+// ACCOUNT SETTINGS — Update Profile (DATABASE-BACKED)
+// -----------------------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_profile') {
+    if (!csrf_verify()) {
+        auditLog($userId, 'update_profile:csrf');
+        setFlash('error', 'Invalid security token. Please refresh and try again.');
+        header('Location: main.php?settings=account&tab=profile');
+        exit;
+    }
+
+    $fullname   = (string)($_POST['fullname'] ?? '');
+    $contact    = (string)($_POST['contact'] ?? '');
+    $department = (string)($_POST['department'] ?? '');
+
+    $result = updateUserProfile($userId, $fullname, $contact, $department);
+    if ($result['success']) {
+        auditLog($userId, 'profile_updated');
+        setFlash('success', $result['message']);
+        header('Location: main.php?settings=account&tab=profile&saved=1');
+        exit;
+    } else {
+        auditLog($userId, 'profile_rejected');
+        setFlash('error', $result['message']);
+        header('Location: main.php?settings=account&tab=profile');
+        exit;
+    }
+}
+
+// -----------------------------------------------------------------------
 // ACCOUNT SETTINGS — Change Password (DATABASE-BACKED with bcrypt)
 // -----------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_password') {
     if (!csrf_verify()) {
+        auditLog($userId, 'update_password:csrf');
         setFlash('error', 'Invalid security token. Please refresh and try again.');
         header('Location: main.php?settings=account&tab=security');
         exit;
@@ -293,24 +323,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 }
 
 // -----------------------------------------------------------------------
+// ACCOUNT SETTINGS — Deactivate / Archive Own Account
+// -----------------------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archive_account') {
+    if (!csrf_verify()) {
+        auditLog($userId, 'archive_account:csrf');
+        setFlash('error', 'Invalid security token. Please refresh and try again.');
+        header('Location: main.php?settings=account&tab=security');
+        exit;
+    }
+
+    $confirmText = trim((string)($_POST['confirm_text'] ?? ''));
+    if ($confirmText !== 'DEACTIVATE') {
+        auditLog($userId, 'account_archive_denied:confirm');
+        setFlash('error', 'Please type DEACTIVATE exactly to confirm account deactivation.');
+        header('Location: main.php?settings=account&tab=security');
+        exit;
+    }
+
+    $currentPassword = (string)($_POST['current_password'] ?? '');
+    $result = archiveOwnAccount($userId, $currentPassword);
+
+    if ($result['success']) {
+        auditLog($userId, 'account_archived');
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+        }
+        session_destroy();
+        header('Location: login.php?logged_out=1');
+        exit;
+    } else {
+        $reason = $result['reason'] ?? 'error';
+        auditLog($userId, 'account_archive_denied:' . $reason);
+        setFlash('error', $result['message']);
+        header('Location: main.php?settings=account&tab=security');
+        exit;
+    }
+}
+
+// -----------------------------------------------------------------------
 // SYSTEM SETTINGS — Update Site Config (Admin only, DATABASE-BACKED)
 // -----------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_sys_config') {
     if (!csrf_verify()) {
+        auditLog($userId, 'update_sys_config:csrf');
         setFlash('error', 'Invalid security token. Please refresh and try again.');
         header('Location: main.php?settings=system');
         exit;
     }
 
-    if ($isAdmin) {
-        saveSystemConfig([
-            'maintenance_mode'   => isset($_POST['sys_maintenance']) ? '1' : '0',
-            'slot_buffer_hrs'    => (string)max(0, intval($_POST['sys_slot_buffer'] ?? 1)),
-            'max_advance_days'   => (string)max(1, intval($_POST['sys_max_advance']  ?? 30)),
-        ], $userId);
-        auditLog($userId, 'sys_config_updated');
-        setFlash('success', 'System configuration saved.');
+    if (!$isAdmin) {
+        auditLog($userId, 'sys_config_denied');
+        setFlash('error', 'You do not have permission to change system settings.');
+        header('Location: main.php');
+        exit;
     }
+
+    $rawBuffer  = $_POST['sys_slot_buffer'] ?? '';
+    $rawAdvance = $_POST['sys_max_advance'] ?? '';
+
+    $validBuffer = filter_var($rawBuffer, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 0, 'max_range' => 4]
+    ]);
+    if ($validBuffer === false) {
+        auditLog($userId, 'sys_config_rejected');
+        setFlash('error', 'Slot buffer must be an integer between 0 and 4 hours.');
+        header('Location: main.php?settings=system');
+        exit;
+    }
+
+    $validAdvance = filter_var($rawAdvance, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 365]
+    ]);
+    if ($validAdvance === false) {
+        auditLog($userId, 'sys_config_rejected');
+        setFlash('error', 'Advance booking window must be an integer between 1 and 365 days.');
+        header('Location: main.php?settings=system');
+        exit;
+    }
+
+    saveSystemConfig([
+        'maintenance_mode'   => isset($_POST['sys_maintenance']) ? '1' : '0',
+        'slot_buffer_hrs'    => (string)$validBuffer,
+        'max_advance_days'   => (string)$validAdvance,
+    ], $userId);
+    auditLog($userId, 'sys_config_updated');
+    setFlash('success', 'System configuration saved.');
     header('Location: main.php?settings=system&saved=1');
     exit;
 }
@@ -323,10 +423,12 @@ $flash      = getFlash();
 $actionMsg  = $flash['text'] ?? '';
 $actionType = $flash['type'] ?? '';
 
-$prefsSaved = (($_GET['settings'] ?? '') === 'account' && isset($_GET['saved']) && $actionType === 'success');
-$pwdSuccess = (($_GET['settings'] ?? '') === 'account' && ($_GET['tab'] ?? '') === 'security' && $actionType === 'success');
-$pwdError   = (($_GET['settings'] ?? '') === 'account' && ($_GET['tab'] ?? '') === 'security' && $actionType === 'error') ? $actionMsg : '';
-$sysSaved   = (($_GET['settings'] ?? '') === 'system'  && isset($_GET['saved']) && $actionType === 'success');
+$prefsSaved     = (($_GET['settings'] ?? '') === 'account' && isset($_GET['saved']) && $actionType === 'success');
+$profileSuccess = (($_GET['settings'] ?? '') === 'account' && ($_GET['tab'] ?? '') === 'profile' && $actionType === 'success');
+$profileError   = (($_GET['settings'] ?? '') === 'account' && ($_GET['tab'] ?? '') === 'profile' && $actionType === 'error') ? $actionMsg : '';
+$pwdSuccess     = (($_GET['settings'] ?? '') === 'account' && ($_GET['tab'] ?? '') === 'security' && $actionType === 'success');
+$pwdError       = (($_GET['settings'] ?? '') === 'account' && ($_GET['tab'] ?? '') === 'security' && $actionType === 'error') ? $actionMsg : '';
+$sysSaved       = (($_GET['settings'] ?? '') === 'system'  && isset($_GET['saved']) && $actionType === 'success');
 
 // Read booked slots for calendar conflict engine (no leaked private data)
 $bookedSlots  = getBookedSlots();
@@ -422,6 +524,14 @@ $reservations = $isAdmin ? getAllReservations() : [];
                 <?php echo icon('clipboard-list', 18); ?>
                 <span>View Reservations</span>
             </a>
+
+            <?php if (isPrivilegedUser($currentUser)): ?>
+            <!-- Admin Review: Review pending reservations -->
+            <a href="admin.php" class="sidebar-nav-pill">
+                <?php echo icon('shield', 18); ?>
+                <span>Admin Review</span>
+            </a>
+            <?php endif; ?>
 
             <hr class="sidebar-divider-hr" aria-hidden="true">
             <p class="sidebar-nav-section-label">Settings</p>
@@ -1470,22 +1580,69 @@ $reservations = $isAdmin ? getAllReservations() : [];
                             <div class="settings-info-value"><?php echo htmlspecialchars($currentUser['id_number'] ?? 'N/A'); ?></div>
                         </div>
                         <div class="settings-info-item">
+                            <div class="settings-info-label">Email</div>
+                            <div class="settings-info-value"><?php echo htmlspecialchars($currentUser['email'] ?? 'N/A'); ?></div>
+                        </div>
+                        <div class="settings-info-item">
                             <div class="settings-info-label">Role</div>
-                            <div class="settings-info-value"><?php echo htmlspecialchars($currentUser['role']); ?></div>
-                        </div>
-                        <div class="settings-info-item">
-                            <div class="settings-info-label">Department</div>
-                            <div class="settings-info-value"><?php echo htmlspecialchars($currentUser['department']); ?></div>
-                        </div>
-                        <div class="settings-info-item">
-                            <div class="settings-info-label">Contact</div>
-                            <div class="settings-info-value"><?php echo htmlspecialchars($currentUser['contact'] ?? 'Not set'); ?></div>
+                            <div class="settings-info-value"><?php echo htmlspecialchars($currentUser['role'] ?? ''); ?></div>
                         </div>
                     </div>
 
-                    <p class="settings-section-sub" style="font-size:0.79rem;color:#94a3b8;margin-top:8px;">
-                        Profile information is managed by the institution. Contact your administrator to update records.
+                    <p class="settings-section-sub">
+                        Email and ID number cannot be changed here.
                     </p>
+
+                    <?php if ($profileError): ?>
+                        <div class="settings-alert error show" role="alert">⚠️ <?php echo htmlspecialchars($profileError); ?></div>
+                    <?php endif; ?>
+                    <?php if ($profileSuccess): ?>
+                        <div class="settings-alert success show" role="alert">✅ Profile updated successfully.</div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="main.php" id="profileForm" autocomplete="off">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
+                        <input type="hidden" name="action" value="update_profile">
+
+                        <div class="main-form-row">
+                            <label class="main-form-label" for="profileFullname">Full Name <span class="req">*</span></label>
+                            <input type="text"
+                                   id="profileFullname"
+                                   name="fullname"
+                                   class="main-form-input"
+                                   value="<?php echo htmlspecialchars($currentUser['fullname'] ?? ''); ?>"
+                                   required
+                                   minlength="2"
+                                   maxlength="150">
+                        </div>
+
+                        <div class="main-form-2col">
+                            <div class="main-form-row">
+                                <label class="main-form-label" for="profileContact">Contact Number <span class="req">*</span></label>
+                                <input type="text"
+                                       id="profileContact"
+                                       name="contact"
+                                       class="main-form-input"
+                                       value="<?php echo htmlspecialchars($currentUser['contact'] ?? ''); ?>"
+                                       placeholder="e.g. 0912 345 6789"
+                                       required
+                                       minlength="7"
+                                       maxlength="20">
+                            </div>
+                            <div class="main-form-row">
+                                <label class="main-form-label" for="profileDepartment">Department</label>
+                                <input type="text"
+                                       id="profileDepartment"
+                                       name="department"
+                                       class="main-form-input"
+                                       value="<?php echo htmlspecialchars($currentUser['department'] ?? ''); ?>"
+                                       placeholder="e.g. College of Science"
+                                       maxlength="100">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-settings-save" id="btnSaveProfile">💾 Save Profile</button>
+                    </form>
 
                 </div>
 
@@ -1499,7 +1656,7 @@ $reservations = $isAdmin ? getAllReservations() : [];
                         <div class="settings-alert error show" role="alert">⚠️ <?php echo htmlspecialchars($pwdError); ?></div>
                     <?php endif; ?>
                     <?php if ($pwdSuccess): ?>
-                        <div class="settings-alert success show" role="alert">✅ Password updated successfully.</div>
+                        <div class="settings-alert success show" role="alert">✅ <?php echo htmlspecialchars($actionMsg ?: 'Password updated successfully.'); ?></div>
                     <?php endif; ?>
 
                     <form method="POST" action="main.php" id="pwdChangeForm" autocomplete="off">
@@ -1544,6 +1701,37 @@ $reservations = $isAdmin ? getAllReservations() : [];
                         <div id="pwdClientError" class="settings-alert error" style="margin-top:0;" role="alert"></div>
 
                         <button type="submit" class="btn-settings-save" id="btnSavePwd">🔒 Update Password</button>
+                    </form>
+
+                    <p class="settings-section-title">Deactivate Account</p>
+                    <p class="settings-section-sub">Deactivating your account will disable your login and archive your profile.</p>
+
+                    <form method="POST" action="main.php" id="deactivateForm" autocomplete="off">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
+                        <input type="hidden" name="action" value="archive_account">
+
+                        <div class="main-form-row">
+                            <label class="main-form-label" for="deactivatePassword">Current Password <span class="req">*</span></label>
+                            <input type="password"
+                                   id="deactivatePassword"
+                                   name="current_password"
+                                   class="main-form-input"
+                                   autocomplete="current-password"
+                                   placeholder="Enter current password"
+                                   required>
+                        </div>
+
+                        <div class="main-form-row">
+                            <label class="main-form-label" for="deactivateConfirm">Confirmation <span class="req">*</span></label>
+                            <input type="text"
+                                   id="deactivateConfirm"
+                                   name="confirm_text"
+                                   class="main-form-input"
+                                   placeholder="Type DEACTIVATE to confirm"
+                                   required>
+                        </div>
+
+                        <button type="submit" class="btn-settings-save" id="btnDeactivateAccount">⚠️ Deactivate Account</button>
                     </form>
 
                 </div>

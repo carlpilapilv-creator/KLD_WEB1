@@ -18,6 +18,9 @@
  *    is used for all password storage. Plaintext is never stored.
  */
 
+// Set PHP default timezone to Philippine Standard Time (UTC+8, no DST)
+date_default_timezone_set('Asia/Manila');
+
 // ─── Database Configuration ─────────────────────────────────────────────────
 define('DB_HOST',     'localhost');
 define('DB_USER',     'root');
@@ -40,6 +43,8 @@ if ($conn->connect_error) {
 $conn->query("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET " . DB_CHARSET . " COLLATE utf8mb4_unicode_ci");
 $conn->select_db(DB_NAME);
 $conn->set_charset(DB_CHARSET);
+// Synchronize MySQL session time zone with Philippine Standard Time (UTC+8)
+$conn->query("SET time_zone = '+08:00'");
 
 // ─── Query Helpers ──────────────────────────────────────────────────────────
 

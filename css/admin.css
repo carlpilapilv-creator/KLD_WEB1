@@ -1,0 +1,366 @@
+/* ==========================================================================
+   KOLEHIYO NG LUNGSOD NG DASMARIÑAS (KLD) - FACILITY RESERVATION SYSTEM
+   STYLESHEET: Admin Review Dashboard (css/admin.css)
+
+   ACADEMIC DEFENSE: This file is scoped exclusively to admin.php.
+   All colors, fonts, radii and shadows reuse existing design tokens from
+   css/style.css, css/base.css, and css/dashboard_style.css.
+   ZERO new color values. ZERO new fonts. ZERO inline styles.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. FLASH ALERT — ERROR VARIANT (red, for approve/reject failures)
+   ========================================================================== */
+.main-flash-alert.flash-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+
+.main-flash-alert.flash-error .main-flash-dismiss {
+    color: #991b1b;
+}
+
+/* ==========================================================================
+   2. ADMIN PAGE HEADER BANNER
+   ========================================================================== */
+.admin-header-banner {
+    background: linear-gradient(135deg, #073822 0%, #0d5c3a 100%);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(0, 104, 55, 0.18);
+}
+
+.admin-header-info {
+    min-width: 0;
+}
+
+.admin-header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+}
+
+.admin-header-subtitle {
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+.admin-header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.admin-header-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.admin-header-link:hover {
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   3. PENDING REQUEST CARDS
+   ========================================================================== */
+.admin-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-bottom: 32px;
+}
+
+.admin-request-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 20px 22px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.admin-request-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.admin-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-card-id {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.admin-card-requester {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.admin-card-details {
+    font-size: 0.82rem;
+    color: #334155;
+    line-height: 1.55;
+}
+
+.admin-card-details strong {
+    color: #0f172a;
+}
+
+/* "Time passed" badge */
+.admin-badge-expired {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+/* Action row: approve + reject side by side */
+.admin-card-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-top: 4px;
+}
+
+.admin-reject-group {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-reject-input {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #334155;
+    outline: none;
+    transition: border-color 0.18s ease;
+    box-sizing: border-box;
+}
+
+.admin-reject-input:focus {
+    border-color: #006837;
+}
+
+.admin-reject-input::placeholder {
+    color: #94a3b8;
+}
+
+/* Approve button (green, reuses reserve style but sized for admin) */
+.admin-btn-approve {
+    background: linear-gradient(135deg, #006837 0%, #0a4d2b 100%);
+    border: none;
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+.admin-btn-approve:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 104, 55, 0.38);
+}
+
+.admin-btn-approve:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Reject button (outline red, matches btn-cancel-res sizing) */
+.admin-btn-reject {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    color: #dc2626;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+.admin-btn-reject:hover {
+    background: #fee2e2;
+}
+
+/* ==========================================================================
+   4. RECENTLY REVIEWED SECTION
+   ========================================================================== */
+.admin-reviewed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.admin-reviewed-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.84rem;
+    color: #334155;
+}
+
+.admin-reviewed-item:last-child {
+    border-bottom: none;
+}
+
+.admin-reviewed-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.admin-reviewed-id {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.84rem;
+}
+
+.admin-reviewed-facility {
+    color: #475569;
+    font-size: 0.82rem;
+}
+
+.admin-reviewed-date {
+    color: #94a3b8;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .admin-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-header-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-card-actions {
+        flex-direction: column;
+    }
+
+    .admin-btn-approve,
+    .admin-btn-reject {
+        width: 100%;
+        text-align: center;
+    }
+
+    .admin-reviewed-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 12px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-header-actions {
+        width: 100%;
+    }
+
+    .admin-header-link {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.78rem;
+        padding: 8px 14px;
+    }
+
+    .admin-request-card {
+        padding: 16px;
+    }
+}
+
+/* ==========================================================================
+   6. UTILITY — SPACING (replaces inline styles from admin.php)
+   ========================================================================== */
+.admin-empty-pad {
+    padding: 40px 24px;
+}
+
+.admin-cards-pad {
+    padding: 20px 24px;
+}
+
+.admin-section-gap {
+    margin-top: 28px;
+}
