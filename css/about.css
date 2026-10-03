@@ -1,0 +1,336 @@
+/* ==========================================================================
+   KOLEHIYO NG LUNGSOD NG DASMARIÑAS (KLD) - FACILITY RESERVATION SYSTEM
+   STYLESHEET: About Us / Developers Portfolio (css/about.css)
+
+   LAYOUT: 2x2 Grid — sharp, square image containers, zero border-radius on photos.
+   ========================================================================== */
+
+/* ── Hero Section (University Visual Branding) ────────────────────────────── */
+.about-hero-section {
+    position: relative;
+    min-height: 220px;
+    height: 28vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 70px;
+    overflow: hidden;
+}
+
+.about-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 71, 43, 0.90) 0%, rgba(13, 92, 58, 0.92) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px 20px 20px;
+    text-align: center;
+}
+
+.about-hero-title {
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 8px;
+    margin: 0;
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.about-hero-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 35%;
+    right: 35%;
+    height: 3px;
+    background: var(--kld-green-accent);
+    border-radius: 2px;
+}
+
+.about-hero-subtitle {
+    color: #e2e8f0;
+    font-size: clamp(0.88rem, 2vw, 0.95rem);
+    margin-top: 10px;
+    max-width: 640px;
+    line-height: 1.55;
+}
+
+/* ── Page Wrapper ─────────────────────────────────────────────────────────── */
+.about-main-wrapper {
+    padding: 56px 0 80px 0;
+    min-height: calc(100vh - 140px);
+    background: #f0f4f8;
+}
+
+/* ── Page Header ──────────────────────────────────────────────────────────── */
+.about-page-header {
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto 56px auto;
+}
+
+.about-category-badge {
+    display: inline-block;
+    background: rgba(0, 104, 55, 0.1);
+    color: #006837;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(0, 104, 55, 0.22);
+    text-transform: uppercase;
+}
+
+.about-page-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.22;
+    margin-bottom: 14px;
+}
+
+.about-page-subtitle {
+    font-size: 0.98rem;
+    color: #64748b;
+    line-height: 1.65;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* ── 2×2 Developer Grid ───────────────────────────────────────────────────── */
+.dev-grid-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+/* ── Individual Developer Profile Card ───────────────────────────────────── */
+.dev-profile-card {
+    background: #ffffff;
+    border-radius: 0;
+    /* Sharp square card edges */
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.dev-profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 104, 55, 0.13);
+    border-color: #006837;
+}
+
+/* ── Developer Photo Container — Sharp Square Frame ──────────────────────
+   ACADEMIC DEFENSE:
+   - border-radius: 0 on both the container and the <img> ensures perfectly
+     sharp, geometric square cropping with no rounded elements anywhere.
+   - object-fit: cover fills the square frame completely.
+   - object-position: top center prioritises the subject's head/face by
+     anchoring the crop to the top of the image, where portrait subjects
+     are typically framed.
+   - The fixed height (260px) gives every card an identical photo area,
+     so all four cards align uniformly in the 2×2 grid.
+   ─────────────────────────────────────────────────────────────────────── */
+.dev-image-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #073822;
+    border-radius: 0;
+    /* Sharp square — no rounding */
+    flex-shrink: 0;
+}
+
+/* Wrapper div introduced in HTML — treated as a full-size pass-through */
+.dev-photo-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    /* Override: square, not circular */
+    border: none;
+    box-shadow: none;
+    overflow: hidden;
+    transform: none;
+    position: static;
+    background: transparent;
+}
+
+/* The <img> itself — square crop, top-anchored */
+.dev-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    /* Full face & head stay in frame */
+    display: block;
+    border-radius: 0;
+    /* Explicitly no rounding */
+    transform-origin: top center;
+    transition: transform 0.3s ease;
+}
+
+.dev-profile-card:hover .dev-photo {
+    transform: scale(1.03);
+}
+
+/* Role chip overlay (bottom-left of image) */
+.dev-role-chip {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(7, 56, 34, 0.88);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 5px 13px;
+    border-radius: 0;
+    /* Square chip to match card aesthetic */
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    z-index: 2;
+    text-transform: uppercase;
+}
+
+/* ── Card Body ────────────────────────────────────────────────────────────── */
+.dev-card-info {
+    padding: 22px 22px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* Stretches to equalise card heights in the row */
+    text-align: left;
+}
+
+/* Developer Full Name */
+.dev-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 3px;
+    line-height: 1.2;
+}
+
+/* Role subtitle */
+.dev-position {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #006837;
+    margin-bottom: 12px;
+}
+
+/* Bio — flex-grow makes all four bio cells the same height */
+.dev-bio {
+    font-size: 0.86rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    flex-grow: 1;
+}
+
+/* ── Student Metadata Fields (Email & Student ID) ───────────────────────────
+   ACADEMIC DEFENSE & USER CUSTOMIZATION:
+   - Placed directly beneath the developer biography.
+   - Clean, geometric design with sharp edges (border-radius: 0) matching the
+     system-wide square framing.
+   - KLD Green (#006837) labels for strong institutional brand cohesion.
+   ─────────────────────────────────────────────────────────────────────────── */
+.dev-meta-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0;
+    font-size: 0.82rem;
+}
+
+.dev-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+}
+
+.dev-meta-label {
+    font-weight: 700;
+    color: #006837;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: 82px;
+    flex-shrink: 0;
+}
+
+.dev-meta-value {
+    color: #334155;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+/* ── Skill Tag Badges ─────────────────────────────────────────────────────── */
+.dev-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: auto;
+}
+
+.skill-tag {
+    background: #f0fff4;
+    color: #006837;
+    font-size: 0.73rem;
+    font-weight: 700;
+    padding: 4px 11px;
+    border-radius: 0;
+    /* Square skill tags to match overall aesthetic */
+    border: 1px solid rgba(0, 104, 55, 0.2);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+/* ── Responsive Breakpoints ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .about-main-wrapper {
+        padding-top: 104px;
+    }
+
+    .dev-grid-2x2 {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding: 0 16px;
+    }
+
+    .about-page-title {
+        font-size: 1.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dev-card-info {
+        padding: 18px 16px 16px 16px;
+    }
+}

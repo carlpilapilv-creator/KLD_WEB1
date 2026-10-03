@@ -1,0 +1,192 @@
+/* ==========================================================================
+   KOLEHIYO NG LUNGSOD NG DASMARIÑAS (KLD) - FACILITY RESERVATION SYSTEM
+   MASTER STYLESHEET (css/style.css)
+   ========================================================================== */
+
+/* ALL @import statements MUST precede all other CSS rules */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('base.css');
+@import url('navbar.css');
+@import url('footer.css');
+@import url('home.css');
+@import url('auth.css');
+@import url('about.css');
+@import url('legal-faq.css');
+@import url('dashboard.css');
+@import url('responsive.css');
+
+/* ==========================================================================
+   DESIGN TOKENS — CSS Custom Properties
+   ========================================================================== */
+:root {
+    /* KLD Brand Color Palette (#006837 Primary Tones) */
+    --kld-green-primary: #006837;
+    --kld-green-dark: #073822;
+    --kld-green-medium: #0d5c3a;
+    --kld-green-accent: #72bf44;
+    --kld-green-light: #e8f5e9;
+    --kld-green-hover: #0a4d2b;
+
+    /* Neutral Background & Surface Tokens */
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f1f5f9;
+    --text-dark: #0f172a;
+    --text-muted: #475569;
+    --text-light: #94a3b8;
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e1;
+
+    /* Visual Status Badge Palette (As specified in defense standards) */
+    --status-approved-bg: #006837;
+    --status-approved-text: #ffffff;
+    --status-pending-bg: #fef08a;
+    --status-pending-text: #854d0e;
+    --status-pending-border: #fde047;
+    --status-rejected-bg: #fee2e2;
+    --status-rejected-text: #991b1b;
+    --status-rejected-border: #fca5a5;
+    --status-completed-bg: #f1f5f9;
+    --status-completed-text: #475569;
+    --status-completed-border: #cbd5e1;
+
+    /* Elevation & Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(114, 191, 68, 0.35);
+
+    /* Radiuses */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-pill: 9999px;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* ==========================================================================
+   GLOBAL STATUS BADGE CLASSES
+   ========================================================================== */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Approved: Solid KLD Green */
+.badge-status.approved,
+.badge-status-approved {
+    background-color: var(--kld-green-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 104, 55, 0.25);
+}
+
+/* Pending: Soft Yellow */
+.badge-status.pending,
+.badge-status-pending {
+    background-color: var(--status-pending-bg);
+    color: var(--status-pending-text);
+    border: 1px solid var(--status-pending-border);
+}
+
+/* Rejected: Crimson */
+.badge-status.rejected,
+.badge-status-rejected {
+    background-color: var(--status-rejected-bg);
+    color: var(--status-rejected-text);
+    border: 1px solid var(--status-rejected-border);
+}
+
+/* Completed: Slate Gray */
+.badge-status.completed,
+.badge-status-completed {
+    background-color: var(--status-completed-bg);
+    color: var(--status-completed-text);
+    border: 1px solid var(--status-completed-border);
+}
+
+/* ==========================================================================
+   DECOUPLED NAVBAR UTILITY CLASSES
+   ========================================================================== */
+.offcanvas-trigger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    padding: 8px 6px;
+    cursor: pointer;
+    margin-right: 14px;
+    transition: var(--transition-fast);
+}
+
+.offcanvas-trigger-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: #ffffff;
+}
+
+.hamburger-bar {
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 2px;
+    transition: var(--transition-fast);
+}
+
+.nav-auth-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.nav-user-pill:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: #ffffff;
+}
+
+.nav-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    color: #fca5a5;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+
+.nav-logout-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ffffff;
+}

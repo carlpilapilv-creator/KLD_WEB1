@@ -1,0 +1,1265 @@
+/* ==========================================================================
+   KOLEHIYO NG LUNGSOD NG DASMARIÑAS (KLD) - FACILITY RESERVATION SYSTEM
+   STYLESHEET: Main Reservation Portal — Facility Catalog Page (css/main.css)
+   
+   ACADEMIC DEFENSE NOTES:
+   This stylesheet is exclusively scoped to main.php (the authenticated facility
+   selection catalog). It intentionally contains ZERO public navbar styles.
+   All navigation on this page is handled by the off-canvas sidebar.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. BASE PAGE STRUCTURE — App-style layout, no public header
+   ========================================================================== */
+.main-page-body {
+    font-family: 'Poppins', sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   2. TOP APPLICATION BAR — Replaces public navbar entirely
+   ========================================================================== */
+.main-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: linear-gradient(135deg, #073822 0%, #0d5c3a 100%);
+    border-bottom: 2px solid #006837;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 14px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+/* Hamburger Toggle Button (Upper-Left) */
+.main-hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    padding: 9px 7px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.main-hamburger-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.main-hamburger-bar {
+    width: 100%;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+/* Brand Identity Section */
+.main-topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex: 1;
+    min-width: 0;
+}
+
+.main-topbar-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    flex-shrink: 0;
+}
+
+.main-topbar-name {
+    color: #ffffff;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Page Title Tag in Topbar */
+.main-topbar-pagetag {
+    background: rgba(114, 191, 68, 0.2);
+    color: #72bf44;
+    border: 1px solid rgba(114, 191, 68, 0.35);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* User Identity Pill in Topbar */
+.main-topbar-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    padding: 5px 14px 5px 5px;
+    flex-shrink: 0;
+}
+
+.main-topbar-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #006837;
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.main-topbar-username {
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   3. OFF-CANVAS SIDEBAR SYSTEM
+   ========================================================================== */
+.main-offcanvas-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.main-offcanvas-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.main-offcanvas-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    max-width: 85vw;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 9001;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
+    border-right: 1px solid #e2e8f0;
+    overflow-y: auto;
+}
+
+.main-offcanvas-sidebar.active {
+    transform: translateX(0);
+}
+
+/* Sidebar Account Header Block */
+.sidebar-account-header-block {
+    background: linear-gradient(145deg, #073822 0%, #0d5c3a 100%);
+    padding: 26px 20px 20px 20px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.sidebar-acct-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.55);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.sidebar-user-row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.sidebar-user-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(0, 104, 55, 0.7);
+    border: 2.5px solid rgba(255, 255, 255, 0.45);
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.sidebar-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-user-fullname {
+    color: #ffffff;
+    font-size: 0.93rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-role-dept {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.75rem;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-close-x-btn {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.sidebar-close-x-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Sidebar Navigation Links */
+.sidebar-nav-body {
+    flex: 1;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-nav-section-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 10px 10px 6px 10px;
+    margin-top: 4px;
+}
+
+.sidebar-nav-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    color: #334155;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    border: 1.5px solid transparent;
+}
+
+.sidebar-nav-pill:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #e2e8f0;
+}
+
+.sidebar-nav-pill.active-pill {
+    background: #e8f5e9;
+    color: #006837;
+    border-color: rgba(0, 104, 55, 0.2);
+    font-weight: 600;
+}
+
+.sidebar-nav-pill-icon {
+    font-size: 1.05rem;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sidebar-divider-hr {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+    border: none;
+}
+
+.sidebar-logout-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    color: #dc2626;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    border: 1.5px solid transparent;
+}
+
+.sidebar-logout-pill:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+/* ==========================================================================
+   4. MAIN CONTENT AREA — Facility Selection Catalog
+   ========================================================================== */
+.main-content-wrapper {
+    flex: 1;
+    padding: 36px 0 56px 0;
+}
+
+/* Flash Notification */
+.main-flash-alert {
+    background: #dcfce7;
+    color: #166534;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 0.9rem;
+    animation: fadeInDown 0.35s ease-out;
+}
+
+.main-flash-dismiss {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #166534;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.main-flash-dismiss:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* Catalog Page Header */
+.main-catalog-header {
+    margin-bottom: 28px;
+}
+
+.main-catalog-eyebrow {
+    display: inline-block;
+    background: rgba(0, 104, 55, 0.1);
+    color: #006837;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    border: 1px solid rgba(0, 104, 55, 0.22);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.main-catalog-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.main-catalog-subtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    line-height: 1.55;
+    max-width: 600px;
+}
+
+/* Filter & Search Bar */
+.main-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 28px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.main-category-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.main-tab-btn {
+    background: #f1f5f9;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.81rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    font-family: 'Poppins', sans-serif;
+}
+
+.main-tab-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.main-tab-btn.active {
+    background: #006837;
+    color: #ffffff;
+    border-color: #006837;
+    box-shadow: 0 2px 8px rgba(0, 104, 55, 0.28);
+}
+
+.main-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    min-width: 220px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.main-search-box:focus-within {
+    border-color: #006837;
+    box-shadow: 0 0 0 3px rgba(0, 104, 55, 0.08);
+}
+
+.main-search-icon {
+    color: #94a3b8;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+}
+
+.main-search-input {
+    border: none;
+    background: transparent;
+    font-size: 0.87rem;
+    color: #0f172a;
+    width: 100%;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+.main-search-input::placeholder {
+    color: #94a3b8;
+}
+
+/* ==========================================================================
+   5. FACILITY CARD GRID
+   ========================================================================== */
+.main-facility-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+/* Empty State */
+.main-empty-state {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.main-empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* Individual Facility Card */
+.main-fac-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.main-fac-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 32px rgba(0, 104, 55, 0.1);
+    border-color: #006837;
+}
+
+/* Card Image Wrapper */
+.main-fac-img-wrap {
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+    background: #073822;
+}
+
+.main-fac-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.32s ease;
+}
+
+.main-fac-card:hover .main-fac-img {
+    transform: scale(1.05);
+}
+
+.main-fac-status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #006837;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.main-fac-cat-tag {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(7, 56, 34, 0.88);
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Card Body */
+.main-fac-card-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.main-fac-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.main-fac-desc {
+    font-size: 0.83rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    flex: 1;
+}
+
+.main-fac-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.main-spec-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.77rem;
+    color: #475569;
+}
+
+/* Card Action Buttons Row */
+.main-fac-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: auto;
+}
+
+.btn-main-view-details {
+    flex: 1;
+    background: #f1f5f9;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.81rem;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-main-view-details:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.btn-main-reserve {
+    flex: 2;
+    background: #006837;
+    border: none;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-main-reserve:hover {
+    background: #073822;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 104, 55, 0.3);
+}
+
+/* ==========================================================================
+   6. BOOKING MODAL — Event Request Form (Lives ONLY inside this modal)
+   ========================================================================== */
+.main-modal-window {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 660px;
+    max-height: 92vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.28);
+    animation: mainModalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes mainModalUp {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Modal Header */
+.main-modal-hdr {
+    background: linear-gradient(135deg, #073822 0%, #0d5c3a 100%);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    border-bottom: 3px solid #006837;
+    flex-shrink: 0;
+}
+
+.main-modal-hdr-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.main-modal-hdr-text {
+    flex: 1;
+}
+
+.main-modal-hdr-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 2px 0;
+}
+
+.main-modal-hdr-sub {
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, 0.62);
+    margin: 0;
+}
+
+.main-modal-close-x {
+    position: absolute;
+    top: 13px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.main-modal-close-x:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Modal Body (scrollable) */
+.main-modal-body {
+    padding: 22px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Selected Venue Display Banner */
+.booking-venue-banner {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f0fff4 100%);
+    border: 1.5px solid rgba(0, 104, 55, 0.22);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 22px;
+}
+
+.venue-banner-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.venue-banner-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #006837;
+}
+
+.venue-banner-meta {
+    font-size: 0.79rem;
+    color: #475569;
+    margin-top: 2px;
+}
+
+/* Form Fields */
+.main-form-row {
+    margin-bottom: 16px;
+}
+
+.main-form-label {
+    display: block;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.main-form-label .req {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.main-form-input,
+.main-form-select,
+.main-form-textarea {
+    width: 100%;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-size: 0.88rem;
+    color: #0f172a;
+    background: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.main-form-input:focus,
+.main-form-select:focus,
+.main-form-textarea:focus {
+    border-color: #006837;
+    box-shadow: 0 0 0 3px rgba(0, 104, 55, 0.1);
+}
+
+.main-form-textarea {
+    resize: vertical;
+    min-height: 86px;
+    line-height: 1.5;
+}
+
+/* 2-Column Grid for side-by-side fields */
+.main-form-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+/* Conflict Detection Indicator Box */
+.main-conflict-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    border: 1.5px solid;
+    transition: all 0.25s ease;
+}
+
+.main-conflict-box.clear {
+    background: #f0fff4;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.main-conflict-box.conflict {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+.conflict-status-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.conflict-status-title {
+    font-weight: 700;
+    font-size: 0.87rem;
+    margin-bottom: 3px;
+}
+
+.conflict-status-detail {
+    font-size: 0.79rem;
+    line-height: 1.45;
+    opacity: 0.9;
+}
+
+/* Pre-Event Documents Upload Section */
+.main-upload-section {
+    margin-bottom: 18px;
+}
+
+.main-upload-heading {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+}
+
+.main-upload-subtext {
+    font-size: 0.79rem;
+    color: #64748b;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.main-upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.main-dropzone {
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 18px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.main-dropzone:hover,
+.main-dropzone.has-file {
+    border-color: #006837;
+    background: #f0fff4;
+}
+
+.main-dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.main-dropzone-icon {
+    font-size: 1.6rem;
+    margin-bottom: 5px;
+}
+
+.main-dropzone-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 3px;
+}
+
+.main-dropzone-hint {
+    font-size: 0.73rem;
+    color: #94a3b8;
+}
+
+.main-dropzone-chip {
+    display: none;
+    margin-top: 8px;
+    background: #006837;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.main-dropzone-chip.active {
+    display: inline-block;
+}
+
+/* Modal Footer */
+.main-modal-ftr {
+    padding: 14px 22px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+    background: #f8fafc;
+}
+
+.btn-modal-dismiss-outline {
+    flex: 1;
+    background: transparent;
+    border: 1.5px solid #cbd5e1;
+    color: #64748b;
+    padding: 11px;
+    border-radius: 9999px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.18s ease;
+}
+
+.btn-modal-dismiss-outline:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.btn-modal-review-submit {
+    flex: 2;
+    background: #006837;
+    border: none;
+    color: #ffffff;
+    padding: 11px 18px;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.btn-modal-review-submit:hover {
+    background: #073822;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   7. BOOKING SUMMARY VERIFICATION MODAL
+   ========================================================================== */
+.main-summary-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+    margin-bottom: 16px;
+}
+
+.main-summary-tbl th,
+.main-summary-tbl td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+    vertical-align: top;
+}
+
+.main-summary-tbl th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    width: 36%;
+    font-size: 0.81rem;
+    white-space: nowrap;
+}
+
+.main-summary-tbl td {
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.main-hold-notice {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: #92400e;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+.summary-docs-ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.summary-doc-li {
+    font-size: 0.81rem;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-modal-confirm-final {
+    flex: 2;
+    background: #006837;
+    border: none;
+    color: #ffffff;
+    padding: 11px 18px;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.btn-modal-confirm-final:hover {
+    background: #073822;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   8. QUICK VIEW DETAIL MODAL (Reuses home.css modal classes + extras below)
+   ========================================================================== */
+.qv-amenities-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.qv-amenity-li {
+    font-size: 0.87rem;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qv-policy-box {
+    font-size: 0.85rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 11px 14px;
+    border-radius: 8px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.qv-btn-row {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-qv-close {
+    flex: 1;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 9999px;
+    padding: 11px;
+    background: #ffffff;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.87rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-qv-close:hover {
+    background: #f1f5f9;
+}
+
+.btn-qv-reserve {
+    flex: 2;
+    background: #006837;
+    border: none;
+    color: #ffffff;
+    padding: 11px 18px;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.btn-qv-reserve:hover {
+    background: #073822;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   9. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .main-facility-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-topbar-name {
+        display: none;
+    }
+
+    .main-topbar-pagetag {
+        display: none;
+    }
+
+    .main-facility-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .main-search-box {
+        min-width: 100%;
+    }
+
+    .main-form-2col {
+        grid-template-columns: 1fr;
+    }
+
+    .main-upload-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-catalog-title {
+        font-size: 1.65rem;
+    }
+
+    .main-modal-window {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-modal-ftr {
+        flex-direction: column;
+    }
+
+    .btn-modal-dismiss-outline,
+    .btn-modal-review-submit,
+    .btn-modal-confirm-final,
+    .btn-modal-dismiss-outline {
+        flex: unset;
+        width: 100%;
+    }
+
+    .qv-btn-row {
+        flex-direction: column;
+    }
+}
