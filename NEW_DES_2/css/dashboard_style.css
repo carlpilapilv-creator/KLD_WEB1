@@ -1,0 +1,500 @@
+/* ==========================================================================
+   KOLEHIYO NG LUNGSOD NG DASMARIÑAS (KLD) - FACILITY RESERVATION SYSTEM
+   STYLESHEET: User Dashboard — Booking Overview (css/dashboard_style.css)
+
+   ACADEMIC DEFENSE: This file is scoped exclusively to dashboard.php.
+   It reuses the app-bar and off-canvas sidebar classes from main_style.css
+   (imported below) and adds dashboard-specific overrides for the welcome
+   banner, metric cards, and reservation history table.
+   ========================================================================== */
+
+/* Import the shared portal styles (topbar, sidebar, flash, modals, footer wiring) */
+@import url('main_style.css');
+
+/* ==========================================================================
+   1. PAGE BASE
+   ========================================================================== */
+.dash-page-body {
+    font-family: 'Poppins', sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Main content wrapper below the topbar */
+.dash-content-wrapper {
+    flex: 1;
+    padding: 36px 0 56px 0;
+}
+
+/* ==========================================================================
+   2. FLASH ALERT — WARNING VARIANT (for cancel/rejection confirmation)
+   ========================================================================== */
+.main-flash-alert.flash-warning {
+    background: #fffbeb;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+/* ==========================================================================
+   3. WELCOME & PROFILE BANNER
+   ========================================================================== */
+.dash-welcome-banner {
+    background: linear-gradient(135deg, #073822 0%, #0d5c3a 100%);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(0, 104, 55, 0.18);
+}
+
+.dash-welcome-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.dash-welcome-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    border: 2.5px solid rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+    font-size: 1.35rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.dash-welcome-info {
+    min-width: 0;
+}
+
+.dash-welcome-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+
+.dash-welcome-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.dash-role-pill {
+    background: rgba(114, 191, 68, 0.2);
+    color: #72bf44;
+    border: 1px solid rgba(114, 191, 68, 0.35);
+    font-size: 0.77rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 9999px;
+}
+
+.dash-dept-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.81rem;
+}
+
+.dash-welcome-right {
+    flex-shrink: 0;
+}
+
+/* Primary CTA button — links to main.php facility catalog */
+.btn-dash-new-booking {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #ffffff;
+    color: #006837;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 11px 22px;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-dash-new-booking:hover {
+    background: #f0fff4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================================================
+   4. METRIC STAT CARDS (4-column grid)
+   ========================================================================== */
+.dash-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 32px;
+}
+
+.dash-metric-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dash-metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.dash-metric-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dash-metric-label {
+    font-size: 0.77rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 4px 0;
+}
+
+.dash-metric-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+}
+
+/* Colored metric value text */
+.dash-val-approved { color: #006837; }
+.dash-val-pending  { color: #d97706; }
+.dash-val-rejected { color: #dc2626; }
+
+/* Metric icon badge */
+.dash-metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+    font-style: normal;
+}
+
+.dash-icon-all      { background: #f1f5f9; color: #475569; }
+.dash-icon-approved { background: #dcfce7; color: #006837; }
+.dash-icon-pending  { background: #fef9c3; color: #d97706; }
+.dash-icon-rejected { background: #fee2e2; color: #dc2626; }
+
+/* ==========================================================================
+   5. RESERVATION HISTORY TABLE SECTION
+   ========================================================================== */
+.dash-table-section {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Table Section Header */
+.dash-table-hdr {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 20px 24px 16px 24px;
+    border-bottom: 1.5px solid #f1f5f9;
+}
+
+.dash-table-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+}
+
+.dash-table-subtitle {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+/* Status Filter Pill Buttons */
+.dash-filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.dash-filter-pill {
+    background: #f1f5f9;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.79rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.dash-filter-pill:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.dash-filter-pill.active {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+
+/* Colored variant for Approved filter */
+.dash-pill-approved.active {
+    background: #006837;
+    border-color: #006837;
+    color: #ffffff;
+}
+
+/* Colored variant for Pending filter */
+.dash-pill-pending.active {
+    background: #d97706;
+    border-color: #d97706;
+    color: #ffffff;
+}
+
+/* Colored variant for Rejected filter */
+.dash-pill-rejected.active {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+/* Table Scroll Wrapper */
+.dash-table-responsive {
+    overflow-x: auto;
+}
+
+/* Main Reservation Table */
+.dash-res-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+}
+
+.dash-res-table thead th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.77rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 11px 18px;
+    border-bottom: 1.5px solid #e2e8f0;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dash-res-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s ease;
+}
+
+.dash-res-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.dash-res-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.dash-res-table td {
+    padding: 13px 18px;
+    vertical-align: top;
+    color: #334155;
+}
+
+/* Reservation ID styling */
+.res-id-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.res-date-main {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.res-date-sub {
+    font-size: 0.76rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.res-purpose-cell {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Action button area */
+.res-actions-cell {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.inline-form {
+    display: inline;
+}
+
+/* View Slip button */
+.btn-view-slip {
+    background: #f1f5f9;
+    border: 1.5px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-view-slip:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Cancel button */
+.btn-cancel-res {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    color: #dc2626;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-cancel-res:hover {
+    background: #fee2e2;
+}
+
+/* Empty state (no reservations yet) */
+.dash-empty-row td {
+    padding: 40px 24px;
+}
+
+.dash-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    color: #64748b;
+}
+
+.dash-empty-icon {
+    font-size: 2.5rem;
+}
+
+.dash-empty-state p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* ==========================================================================
+   6. MODAL COMPONENT WIRING
+   These classes come from main_style.css (via @import).
+   The dashboard uses the same .modal-backdrop, .main-modal-window,
+   .main-modal-hdr, .main-modal-body, .main-modal-ftr, and .main-summary-tbl
+   components — no duplication needed.
+   ========================================================================== */
+
+/* ==========================================================================
+   7. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .dash-metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-topbar-name,
+    .main-topbar-pagetag {
+        display: none;
+    }
+
+    .dash-welcome-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dash-metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .dash-table-hdr {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .res-purpose-cell {
+        max-width: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dash-metrics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .dash-metric-value {
+        font-size: 1.9rem;
+    }
+
+    .res-actions-cell {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

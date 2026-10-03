@@ -1,0 +1,1114 @@
+/* ==========================================================================
+   KOLEHIYO NG LUNGSOD NG DASMARIÑAS (KLD) - FACILITY RESERVATION SYSTEM
+   STYLESHEET: Public Landing Page (css/home.css)
+   Hero, School Intro, Available Facilities Preview, Steps, & Auth Modals
+   ========================================================================== */
+
+/* ==========================================================================
+   1. HERO SECTION (Fixed Visual Hierarchy & Generous Top Clearance)
+   ========================================================================== */
+.hero-section {
+    position: relative;
+    min-height: 520px;
+    height: 58vh;
+    max-height: 660px;
+    background-image: url('../assets/images/campus_bg.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding-top: 80px;
+    /* Provides ample breathing room below the 80px navbar */
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+            rgba(7, 56, 34, 0.88) 0%,
+            rgba(0, 104, 55, 0.82) 50%,
+            rgba(7, 56, 34, 0.92) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 90px 24px 40px 24px;
+}
+
+.hero-content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-title {
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.4rem, 5.2vw, 3.8rem);
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    line-height: 1.15;
+    margin: 0 0 14px 0;
+}
+
+.hero-subtitle {
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+    margin: 10px 0 36px 0;
+    line-height: 1.55;
+}
+
+.hero-cta-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   2. FACILITY RESERVATIONS INTRO SECTION
+   ========================================================================== */
+.school-intro-section {
+    background-color: #ffffff;
+    padding: 68px 0;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.intro-content-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.intro-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.1rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 0;
+    margin-bottom: 22px;
+    padding: 4px 0;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+}
+
+.intro-text {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #334155;
+    /* High contrast dark gray */
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.pill-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--kld-green-accent);
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 16px 28px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 4px 14px rgba(114, 191, 68, 0.35);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    border: none;
+    cursor: pointer;
+}
+
+.pill-btn:hover {
+    background-color: #5ea833;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(114, 191, 68, 0.45);
+    color: #ffffff;
+}
+
+.btn-make-reservation {
+    background-color: var(--kld-green-primary);
+    box-shadow: 0 4px 14px rgba(0, 104, 55, 0.35);
+}
+
+.btn-make-reservation:hover {
+    background-color: #073822;
+    box-shadow: 0 8px 20px rgba(0, 104, 55, 0.45);
+}
+
+/* ── Hero CTA Buttons (override pill-btn and btn-make-reservation defaults) ─ */
+/* Button 1: Solid dark green fill, white uppercase bold text, pill shape */
+.btn-hero-primary {
+    background-color: var(--kld-green-dark, #073822) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.92rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 15px 34px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 18px rgba(7, 56, 34, 0.55);
+    border: 2px solid transparent !important;
+    text-decoration: none;
+}
+
+.btn-hero-primary:hover {
+    background-color: var(--kld-green-primary, #006837) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 104, 55, 0.55);
+}
+
+/* Button 2: Ghost / transparent, thin off-white border, white uppercase bold text */
+.btn-hero-secondary {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.92rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 15px 34px;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+    box-shadow: none !important;
+    text-decoration: none;
+}
+
+.btn-hero-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ==========================================================================
+   3a. SHARED SECTION UTILITIES (Used by Steps, Modals, etc.)
+   ========================================================================== */
+.section-header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 40px auto;
+}
+
+.section-tag {
+    display: inline-block;
+    background: rgba(0, 104, 55, 0.1);
+    color: var(--kld-green-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 12px;
+    border: 1px solid rgba(0, 104, 55, 0.2);
+}
+
+.section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 12px;
+    line-height: 1.2;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #475569;
+    line-height: 1.6;
+}
+
+/* Shared Badge & Tag Styles (used by modals) */
+.category-tag {
+    display: inline-block;
+    background: rgba(15, 23, 42, 0.85);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(4px);
+}
+
+.status-badge {
+    display: inline-block;
+    background: var(--kld-green-primary);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    text-transform: uppercase;
+}
+
+/* Shared Facility Spec Grid (used by detail modal) */
+.facility-specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.spec-item {
+    font-size: 0.8rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ==========================================================================
+   3b. ANIMATED FACILITIES IMAGE SLIDER (Carousel)
+   ========================================================================== */
+.facilities-carousel-section {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.facilities-carousel-section .carousel {
+    height: 85vh;
+    min-height: 520px;
+    max-height: 900px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background-color: #012b1b;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- Main Slide Items --- */
+.facilities-carousel-section .carousel .list .item {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0 0 0 0;
+}
+
+.facilities-carousel-section .carousel .list .item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.45);
+}
+
+.facilities-carousel-section .carousel .list .item .content {
+    position: absolute;
+    top: 18%;
+    width: 1140px;
+    max-width: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-right: 30%;
+    box-sizing: border-box;
+    color: #fff;
+    text-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.facilities-carousel-section .carousel .list .item .author {
+    font-weight: bold;
+    letter-spacing: 5px;
+    color: #10B981;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.facilities-carousel-section .carousel .list .item .title,
+.facilities-carousel-section .carousel .list .item .topic {
+    font-family: 'Outfit', sans-serif;
+    font-size: 3em;
+    font-weight: 800;
+    line-height: 1.2em;
+}
+
+.facilities-carousel-section .carousel .list .item .topic {
+    color: #34D399;
+    font-size: 2.2em;
+    margin-top: 4px;
+}
+
+.facilities-carousel-section .carousel .list .item .des {
+    margin-top: 14px;
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: 550px;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.facilities-carousel-section .carousel .list .item .buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 155px);
+    grid-template-rows: 46px;
+    gap: 15px;
+    margin-top: 24px;
+}
+
+.facilities-carousel-section .carousel .list .item .buttons button {
+    border: none;
+    background-color: rgba(255, 255, 255, 0.92);
+    letter-spacing: 1px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    color: #0f172a;
+}
+
+.facilities-carousel-section .carousel .list .item .buttons button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.facilities-carousel-section .carousel .list .item .buttons button.reserve-btn {
+    background-color: #047857;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(4, 120, 87, 0.4);
+}
+
+.facilities-carousel-section .carousel .list .item .buttons button.reserve-btn:hover {
+    background-color: #065f46;
+    box-shadow: 0 6px 20px rgba(4, 120, 87, 0.55);
+}
+
+.facilities-carousel-section .carousel .list .item .buttons button.details-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.facilities-carousel-section .carousel .list .item .buttons button.details-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: #fff;
+}
+
+/* --- Thumbnail Navigation Strip --- */
+.facilities-carousel-section .thumbnail {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    width: max-content;
+    z-index: 10;
+    display: flex;
+    gap: 18px;
+}
+
+.facilities-carousel-section .thumbnail .item {
+    width: 135px;
+    height: 200px;
+    flex-shrink: 0;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.facilities-carousel-section .thumbnail .item:hover {
+    transform: scale(1.05) translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+    border-color: rgba(16, 185, 129, 0.6);
+}
+
+.facilities-carousel-section .thumbnail .item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.facilities-carousel-section .thumbnail .item .content {
+    color: #fff;
+    position: absolute;
+    bottom: 8px;
+    left: 10px;
+    right: 10px;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.facilities-carousel-section .thumbnail .item .content .title {
+    font-weight: 700;
+    font-size: 0.78rem;
+    line-height: 1.3;
+}
+
+.facilities-carousel-section .thumbnail .item .content .description {
+    font-size: 0.68rem;
+    opacity: 0.85;
+}
+
+/* --- Navigation Arrow Controls --- */
+.facilities-carousel-section .arrows {
+    position: absolute;
+    top: 80%;
+    right: 52%;
+    z-index: 100;
+    width: 300px;
+    max-width: 30%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.facilities-carousel-section .arrows button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(6px);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.facilities-carousel-section .arrows button:hover {
+    background-color: #fff;
+    color: #012b1b;
+    border-color: #fff;
+    transform: scale(1.1);
+}
+
+/* --- Staggered Content Entrance Animation (Active Slide = :nth-child(1)) --- */
+.facilities-carousel-section .carousel .list .item:nth-child(1) {
+    z-index: 1;
+}
+
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .author,
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .title,
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .topic,
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .des,
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .buttons {
+    transform: translateY(50px);
+    filter: blur(20px);
+    opacity: 0;
+    animation: showContent 0.5s 1s linear 1 forwards;
+}
+
+@keyframes showContent {
+    to {
+        transform: translateY(0px);
+        filter: blur(0px);
+        opacity: 1;
+    }
+}
+
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .title {
+    animation-delay: 0.4s !important;
+}
+
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .topic {
+    animation-delay: 0.6s !important;
+}
+
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .des {
+    animation-delay: 0.8s !important;
+}
+
+.facilities-carousel-section .carousel .list .item:nth-child(1) .content .buttons {
+    animation-delay: 1s !important;
+}
+
+/* --- Next Slide Transition Effects --- */
+.facilities-carousel-section .carousel.next .list .item:nth-child(1) img {
+    width: 135px;
+    height: 200px;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    border-radius: 12px;
+    animation: showImage 0.5s linear 1 forwards;
+}
+
+@keyframes showImage {
+    to {
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+}
+
+.facilities-carousel-section .carousel.next .thumbnail .item:nth-last-child(1) {
+    overflow: hidden;
+    animation: showThumbnail 0.5s linear 1 forwards;
+}
+
+@keyframes showThumbnail {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+}
+
+/* --- Prev Slide Transition Effects --- */
+.facilities-carousel-section .carousel.prev .list .item:nth-child(2) {
+    z-index: 2;
+}
+
+.facilities-carousel-section .carousel.prev .list .item:nth-child(2) img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    animation: outFrame 0.5s linear 1 forwards;
+}
+
+@keyframes outFrame {
+    to {
+        width: 135px;
+        height: 200px;
+        border-radius: 12px;
+        left: 50%;
+        bottom: 30px;
+    }
+}
+
+/* --- Time Progress Indicator Bar --- */
+.facilities-carousel-section .carousel .time {
+    position: absolute;
+    z-index: 1000;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #10B981, #34D399);
+    left: 0;
+    top: 0;
+}
+
+.facilities-carousel-section .carousel.next .time,
+.facilities-carousel-section .carousel.prev .time {
+    animation: runningTime 3s linear 1 forwards;
+}
+
+@keyframes runningTime {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0;
+    }
+}
+
+/* --- Carousel Responsive Breakpoints --- */
+@media screen and (max-width: 992px) {
+    .facilities-carousel-section .carousel .list .item .content {
+        padding-right: 10%;
+    }
+
+    .facilities-carousel-section .carousel .list .item .content .title {
+        font-size: 2.4em;
+    }
+
+    .facilities-carousel-section .carousel .list .item .content .topic {
+        font-size: 1.6em;
+    }
+
+    .facilities-carousel-section .thumbnail .item {
+        width: 110px;
+        height: 165px;
+    }
+}
+
+@media screen and (max-width: 678px) {
+    .facilities-carousel-section .carousel {
+        height: 75vh;
+        min-height: 450px;
+    }
+
+    .facilities-carousel-section .carousel .list .item .content {
+        padding-right: 0;
+        max-width: 90%;
+        top: 14%;
+    }
+
+    .facilities-carousel-section .carousel .list .item .content .title {
+        font-size: 1.7em;
+    }
+
+    .facilities-carousel-section .carousel .list .item .content .topic {
+        font-size: 1.2em;
+    }
+
+    .facilities-carousel-section .carousel .list .item .content .des {
+        font-size: 0.88rem;
+    }
+
+    .facilities-carousel-section .carousel .list .item .buttons {
+        grid-template-columns: repeat(2, 130px);
+        grid-template-rows: 40px;
+        gap: 10px;
+    }
+
+    .facilities-carousel-section .carousel .list .item .buttons button {
+        font-size: 0.72rem;
+    }
+
+    .facilities-carousel-section .thumbnail {
+        gap: 10px;
+    }
+
+    .facilities-carousel-section .thumbnail .item {
+        width: 85px;
+        height: 130px;
+    }
+
+    .facilities-carousel-section .thumbnail .item .content .title {
+        font-size: 0.65rem;
+    }
+
+    .facilities-carousel-section .thumbnail .item .content .description {
+        display: none;
+    }
+
+    .facilities-carousel-section .arrows {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        top: auto;
+        bottom: 250px;
+    }
+}
+
+
+/* ==========================================================================
+   4. HOW TO RESERVE SECTION (SERVICES)
+   ========================================================================== */
+.steps-section {
+    padding: 70px 0 80px 0;
+    background-color: #ffffff;
+    border-top: 1px solid var(--border-light);
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.step-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border-color: var(--kld-green-accent);
+}
+
+.step-number {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--kld-green-primary);
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+}
+
+.step-card h4 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.step-card p {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   5. DECOUPLED AUTH REQUIRED POPUP MODAL & QUICK VIEW MODAL
+   ========================================================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ensure Auth Required sign-up prompt always stacks in foreground above facility detail modal */
+#facilityDetailModal {
+    z-index: 99999;
+}
+
+#authRequiredModal {
+    z-index: 100010;
+}
+
+#authRequiredModal .modal-window {
+    position: relative;
+    z-index: 100015;
+}
+
+.modal-window {
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-window-lg {
+    max-width: 680px;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header-accent {
+    background: #073822;
+    padding: 22px 24px;
+    position: relative;
+    border-bottom: 3px solid var(--kld-green-primary);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.modal-icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--kld-green-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.modal-header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-body {
+    padding: 26px 24px;
+    overflow-y: auto;
+}
+
+.modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.modal-text {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.modal-action-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-modal-signup {
+    display: block;
+    background: var(--kld-green-primary);
+    color: #ffffff;
+    text-align: center;
+    padding: 14px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: var(--transition-fast);
+    box-shadow: 0 4px 12px rgba(0, 104, 55, 0.3);
+}
+
+.btn-modal-signup:hover {
+    background: #073822;
+    color: #ffffff;
+}
+
+.btn-modal-login {
+    display: block;
+    background: #f1f5f9;
+    color: #0f172a;
+    text-align: center;
+    padding: 13px;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border: 1px solid #cbd5e1;
+    transition: var(--transition-fast);
+}
+
+.btn-modal-login:hover {
+    background: #e2e8f0;
+}
+
+.btn-modal-dismiss {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 8px;
+    transition: var(--transition-fast);
+}
+
+.btn-modal-dismiss:hover {
+    color: #0f172a;
+}
+
+/* Modal Details Specifics */
+.modal-details-banner {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+}
+
+.modal-details-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-details-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+}
+
+.modal-details-content {
+    padding: 24px;
+}
+
+.modal-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.modal-hours-text {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.modal-desc-text {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.modal-section-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.modal-amenities-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-amenity-item {
+    font-size: 0.88rem;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-policy-box {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin-bottom: 24px;
+    background: #f1f5f9;
+    padding: 12px 16px;
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+.modal-btn-row {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-modal-close-outline {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-pill);
+    padding: 12px;
+    background: #ffffff;
+    color: #475569;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-modal-close-outline:hover {
+    background: #f1f5f9;
+}
+
+.btn-modal-reserve-primary {
+    flex: 2;
+    padding: 12px 20px;
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE BREAKPOINTS (Non-Carousel)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .intro-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .vertical-divider {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding-top: 110px;
+        min-height: 420px;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-btn-row {
+        flex-direction: column;
+    }
+}
